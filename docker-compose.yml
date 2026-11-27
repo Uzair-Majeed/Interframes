@@ -1,0 +1,93 @@
+services:
+  model-moderation:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.models
+    command: ["uvicorn", "app.model_service:app", "--app-dir", "/workspace/backend", "--host", "0.0.0.0", "--port", "8001"]
+    environment:
+      MODEL_SERVICE_KIND: moderation
+      MODEL_DIR: /models
+      MODERATION_DIR: /models/Moderation_Model
+    volumes:
+      - ./models:/models:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=5)"]
+      interval: 20s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
+
+  model-gma:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.models
+    command: ["uvicorn", "app.model_service:app", "--app-dir", "/workspace/backend", "--host", "0.0.0.0", "--port", "8001"]
+    environment:
+      MODEL_SERVICE_KIND: gma
+      MODEL_DIR: /models
+      GMA_DIR: /workspace/backend/app/models/gma_config
+    volumes:
+      - ./models:/models:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=5)"]
+      interval: 20s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
+
+  model-interframes:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.models
+    command: ["uvicorn", "app.model_service:app", "--app-dir", "/workspace/backend", "--host", "0.0.0.0", "--port", "8001"]
+    environment:
+      MODEL_SERVICE_KIND: interframes
+      MODEL_DIR: /models
+    volumes:
+      - ./models:/models:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=5)"]
+      interval: 20s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      MODEL_DIR: /models
+      MODERATION_DIR: /models/Moderation_Model
+      MODERATION_SERVICE_URL: http://model-moderation:8001
+      GMA_SERVICE_URL: http://model-gma:8001
+      INTERFRAMES_SERVICE_URL: http://model-interframes:8001
+      DATABASE_PATH: /data/interframes.sqlite3
+      ARTIFACTS_DIR: /data/artifacts
+      MODEL_SERVICE_TOKEN: ${MODEL_SERVICE_TOKEN:-}
+      MODERATION_THRESHOLD: ${MODERATION_THRESHOLD:-0.5}
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-12582912}
+      MAX_IMAGE_PIXELS: ${MAX_IMAGE_PIXELS:-20000000}
+      MAX_RENDER_DIMENSION: ${MAX_RENDER_DIMENSION:-2048}
+    volumes:
+      - ./models:/models:ro
+      - app-data:/data
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  app-data:

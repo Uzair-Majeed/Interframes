@@ -1,1 +1,17 @@
 models/
+kaggle_setup.zip
+vendor/
+backend/data/
+web/node_modules/
+web/dist/
+*.tsbuildinfo
+__pycache__/
+*.py[cod]
+.pytest_cache/
+**/.pytest-*/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+sample_images/

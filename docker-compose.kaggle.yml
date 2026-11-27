@@ -1,0 +1,13 @@
+services:
+  model-moderation:
+    profiles: ["kaggle-disabled"]
+  model-gma:
+    profiles: ["kaggle-disabled"]
+  model-interframes:
+    profiles: ["kaggle-disabled"]
+  backend:
+    environment:
+      MODERATION_SERVICE_URL: ${KAGGLE_MODEL_GATEWAY_URL:?Set KAGGLE_MODEL_GATEWAY_URL}/moderation
+      GMA_SERVICE_URL: ${KAGGLE_MODEL_GATEWAY_URL:?Set KAGGLE_MODEL_GATEWAY_URL}/gma
+      INTERFRAMES_SERVICE_URL: ${KAGGLE_MODEL_GATEWAY_URL:?Set KAGGLE_MODEL_GATEWAY_URL}/interframes
+      MODEL_SERVICE_TOKEN: ${KAGGLE_MODEL_SERVICE_TOKEN:?Set KAGGLE_MODEL_SERVICE_TOKEN}

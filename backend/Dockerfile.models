@@ -1,0 +1,12 @@
+FROM python:3.12-slim
+WORKDIR /workspace
+COPY backend/requirements-ml.txt /workspace/backend/requirements-ml.txt
+COPY backend/requirements.txt /workspace/backend/requirements.txt
+RUN pip install --no-cache-dir -r /workspace/backend/requirements-ml.txt
+COPY backend /workspace/backend
+ENV PYTHONPATH=/workspace/backend
+ENV MODEL_DIR=/models
+ENV MODERATION_DIR=/models/Moderation_Model
+ENV GMA_DIR=/workspace/backend/app/models/gma_config
+EXPOSE 8001
+CMD ["uvicorn", "app.model_service:app", "--app-dir", "/workspace/backend", "--host", "0.0.0.0", "--port", "8001"]
