@@ -14,8 +14,8 @@ export function GenerationPage() {
   const [fps, setFps] = useState(12);
   const [inkColor, setInkColor] = useState("#111312");
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
-  const [cutoff, setCutoff] = useState<number | null>(null);
-  const [cutoffMode, setCutoffMode] = useState<CutoffMode>("raw");
+  const [cutoff, setCutoff] = useState<number | null>(0.5);
+  const [cutoffMode, setCutoffMode] = useState<CutoffMode>("crisp");
   const [frameStyles, setFrameStyles] = useState<Record<number, FrameStyle>>({});
   const [frames, setFrames] = useState<Frame[]>([]);
   const [regenCount, setRegenCount] = useState(1);
